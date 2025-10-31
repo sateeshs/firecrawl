@@ -99,5 +99,7 @@ services:
       - "5432:5432"
 
 networks:
+  shared_net:
+    driver: bridge
   backend:
     driver: bridge
