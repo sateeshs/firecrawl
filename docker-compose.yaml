@@ -58,6 +58,7 @@ services:
       PROXY_PASSWORD: ${PROXY_PASSWORD}
       BLOCK_MEDIA: ${BLOCK_MEDIA}
     networks:
+      - firecrawl_n8n_shared # Connect API service to the new network
       - backend
 
   api:
@@ -65,7 +66,7 @@ services:
     environment:
       <<: *common-env
       HOST: "0.0.0.0"
-      PORT: ${INTERNAL_PORT:-3002}
+      # PORT: ${INTERNAL_PORT:-3002}
       EXTRACT_WORKER_PORT: ${EXTRACT_WORKER_PORT:-3004}
       WORKER_PORT: ${WORKER_PORT:-3005}
       ENV: local
@@ -75,6 +76,9 @@ services:
     ports:
       - "${PORT:-3002}:${INTERNAL_PORT:-3002}"
     command: node dist/src/harness.js --start-docker
+    networks:
+      - shared_net # <-- This MUST be here.
+      - backend
 
   redis:
     # NOTE: If you want to use Valkey (open source) instead of Redis (source available),
@@ -99,6 +103,8 @@ services:
       - "5432:5432"
 
 networks:
+  firecrawl_n8n_shared:
+    external: true # Tells Compose to use the network we created manually
   shared_net:
     driver: bridge
   backend:
